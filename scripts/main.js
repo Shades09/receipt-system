@@ -151,7 +151,9 @@ document.getElementById('receiptForm').addEventListener('submit', function (e) {
 });
 
 function showPreviewModal(receiptId) {
+  document.getElementById('htmlPreview').style.display = 'none';
   const img = document.getElementById('receiptImage');
+  img.style.display = 'block';
   img.src = `http://127.0.0.1:8000/receipt/render/${receiptId}`;
   const modal = document.getElementById('previewModal');
   modal.classList.remove('hidden');
