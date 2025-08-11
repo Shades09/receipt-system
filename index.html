@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receipt Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-white via-blue-50 to-purple-50 text-gray-800">
+
+ <header class="bg-purple-700 text-white shadow p-4 flex justify-between items-center">
+  <img src="assets/logo.png" alt="Consult Jules Logo" class="h-10">
+  <h1 class="text-xl font-bold tracking-wide">Consult Jules Services</h1>
+</header>
+
+  <main class="p-6 max-w-4xl mx-auto">
+    <!-- Receipt Form will go here -->
+<section class="bg-white p-8 rounded-lg shadow-lg mt-6 border border-gray-200">
+  <h2 class="text-3xl font-bold text-purple-700 mb-6 border-b pb-2">🧾 Create Receipt</h2>
+  <form id="receiptForm" class="space-y-6 text-sm text-gray-700" onsubmit="return false;">
+    
+    <!-- Customer Name -->
+    <div>
+      <label class="block font-medium text-blue-900 mb-1">Customer Name</label>
+      <input type="text" name="customer" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+    </div>
+
+    <!-- Items Table -->
+    <div>
+      <label class="block font-medium text-blue-900 mb-2">Items</label>
+      <table class="w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
+        <thead class="bg-purple-100 text-purple-800">
+          <tr>
+            <th class="px-4 py-2 text-left">Item Name</th>
+            <th class="px-4 py-2 text-left">Quantity</th>
+            <th class="px-4 py-2 text-left">Unit Price</th>
+            <th class="px-4 py-2 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="itemsTable" class="divide-y divide-gray-200">
+          <!-- Rows will be added dynamically -->
+        </tbody>
+      </table>
+      <button type="button" onclick="addItemRow()" class="mt-3 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">
+        ➕ Add Item
+      </button>
+    </div>
+
+    <!-- Tax, Discount, Total -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <label class="block font-medium text-blue-900 mb-1">Tax (%)</label>
+        <input type="number" name="tax" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" value="0" />
+      </div>
+      <div>
+        <label class="block font-medium text-blue-900 mb-1">Discount (%)</label>
+        <input type="number" name="discount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" value="0" />
+      </div>
+      <div>
+        <label class="block font-medium text-blue-900 mb-1">Total (₦)</label>
+        <input type="text" id="totalDisplay" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700" readonly />
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div>
+      <label class="block font-medium text-blue-900 mb-1">Payment Method</label>
+      <select name="payment" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <option>Cash</option>
+        <option>Card</option>
+        <option>Transfer</option>
+      </select>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end">
+      <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg transition duration-200 ease-in-out">
+        Generate Receipt
+      </button>
+    </div>
+  </form>
+</section>
+<!-- Receipt Preview Modal -->
+<div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-xl relative">
+    <h3 class="text-xl font-bold text-purple-700 mb-4">📄 Receipt Preview</h3>
+    <img id="receiptImage" class="w-full h-auto" />
+    <div class="mt-6 flex justify-between">
+      <button onclick="downloadReceipt()" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800">⬇️ Download</button>
+      <button onclick="emailReceipt()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">📧 Email</button>
+    </div>
+  </div>
+</div>
+<div class="transition-opacity duration-300 ease-in-out">
+
+<div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg hidden">
+  ✅ Receipt generated successfully!
+</div>
+
+<!-- Show All Receipts Section -->
+<section id="allReceiptsSection" class="bg-white p-8 rounded-lg shadow-lg mt-6 border border-gray-200">
+  <h2 class="text-2xl font-bold text-purple-700 mb-4">📋 All Receipts</h2>
+  <table class="w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
+    <thead class="bg-purple-100 text-purple-800">
+      <tr>
+        <th class="px-4 py-2 text-left">ID</th>
+        <th class="px-4 py-2 text-left">Customer</th>
+        <th class="px-4 py-2 text-left">Total (₦)</th>
+        <th class="px-4 py-2 text-left">Payment</th>
+        <th class="px-4 py-2 text-left">Tax (%)</th>
+        <th class="px-4 py-2 text-left">Discount (%)</th>
+        <th class="px-4 py-2 text-left">Preview</th>
+      </tr>
+    </thead>
+    <tbody id="receiptsTable">
+      <!-- Rows will be populated by JS -->
+    </tbody>
+  </table>
+</section>
+  </main>
+  <script src="scripts/main.js"></script>
+</body>
+</html>
